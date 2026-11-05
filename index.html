@@ -20,10 +20,10 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
 body{background:radial-gradient(circle at 50% 0%,#26306a 0%,var(--bg) 60%) fixed}
 button{font:inherit;color:inherit;border:0;cursor:pointer}
 #app{max-width:520px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;padding:12px 16px calc(12px + env(safe-area-inset-bottom));position:relative}
-.top{display:flex;align-items:center;gap:10px;min-height:48px}
-.pill{background:var(--card);border-radius:999px;padding:6px 14px;font-size:22px;font-weight:800;display:flex;align-items:center;gap:6px}
+.top{display:flex;align-items:center;gap:6px;min-height:48px}
+.pill{background:var(--card);border-radius:999px;padding:6px 10px;white-space:nowrap;flex-shrink:0;font-size:20px;font-weight:800;display:flex;align-items:center;gap:4px}
 .spacer{flex:1}
-.iconbtn{width:48px;height:48px;border-radius:50%;background:var(--card);font-size:24px;display:grid;place-items:center}
+.iconbtn{flex-shrink:0;width:48px;height:48px;border-radius:50%;background:var(--card);font-size:24px;display:grid;place-items:center}
 .gear{opacity:.35;font-size:20px;width:40px;height:40px}
 .gear.holding{opacity:1;box-shadow:0 0 0 4px var(--accent)}
 
@@ -511,7 +511,9 @@ async function dance(my){document.querySelectorAll('.lumi').forEach(l=>{l.classL
 
 /* ============ ЭКРАНЫ ============ */
 function stopAll(){RUN++;try{speechSynthesis.cancel()}catch(e){}talking(false)}
-const volBtn=()=>`<button class="iconbtn" id="vol">${VOLICON[S.vol]}</button>`;
+// рядом с громкостью — кнопка музыки: 🎵 играет / 🔕 выключена совсем (запоминается)
+const volBtn=()=>`<button class="iconbtn" id="musbtn">${S.music?'🎵':'🔕'}</button><button class="iconbtn" id="vol">${VOLICON[S.vol]}</button>`;
+app.addEventListener('click',e=>{const b=e.target.closest('#musbtn');if(!b)return;S.music=!S.music;save();b.textContent=S.music?'🎵':'🔕';S.music?startMusic():stopMusic()});
 // кнопка громкости: 🔊 → 🔉 → 🔈 → 🔊 (совсем без звука не бывает — иначе ребёнок не услышит Lumi)
 app.addEventListener('click',e=>{const b=e.target.closest('#vol');if(!b)return;S.vol=(S.vol+2)%3;save();b.textContent=VOLICON[S.vol];musicLevel();tone(880,.18)});
 function topbar(extra=''){return `<div class="top"><div class="pill">⭐ ${S.stars}</div><div class="pill">☀️ ${S.streak}</div><div class="spacer"></div>${volBtn()}${extra}</div>`}
@@ -885,7 +887,7 @@ function parent(){stopAll();const ks=known().filter(id=>S.words[id].seen);
      <div style="color:var(--muted);margin-top:6px">Lumi хвалит по имени: «Brawo, Zosia!»</div></div>
    <h2>Имя персонажа</h2><div class="box"><input id="nm" value="${S.name.replace(/"/g,'')}" maxlength="14"></div>
    <h2>Звук</h2><div class="box"><button id="mus">${S.music?'🎵 Фоновая музыка: вкл':'🔇 Фоновая музыка: выкл'}</button>
-     <div style="color:var(--muted);margin-top:6px">Кнопка 🔊 сверху меняет громкость (3 уровня). Если всё равно тихо — громкость медиа кнопками телефона.</div></div>
+     <div style="color:var(--muted);margin-top:6px">Кнопка 🎵/🔕 сверху включает и выключает музыку, 🔊 меняет громкость (3 уровня). Если всё равно тихо — громкость медиа кнопками телефона.</div></div>
    <h2>Знакомство</h2><div class="box"><button id="reob">Пройти знакомство заново</button>
      <div style="color:var(--muted);margin-top:6px">Ребёнок снова скажет имя и выберет цвет и имя персонажа. Прогресс сохранится.</div></div>
    <h2>Проверка</h2><div class="box"><button id="tv">🔊 Голос</button><button id="tm">🎤 Микрофон</button><div style="color:var(--muted);margin-top:6px;font-size:14px">${voiceInfo}</div></div>
