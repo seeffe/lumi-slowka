@@ -57,8 +57,8 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .play{margin:10px auto;background:linear-gradient(180deg,#ffe073,#ffb627);color:#3a2600;font-size:34px;font-weight:900;border-radius:32px;padding:20px 48px;box-shadow:0 8px 0 #c98400,0 14px 30px #0008;animation:pulse 1.6s ease-in-out infinite}
 .play:active{transform:translateY(6px);box-shadow:0 2px 0 #c98400}
 @keyframes pulse{0%,100%{scale:1}50%{scale:1.05}}
-.homebtns{display:flex;gap:14px;justify-content:center}
-.bigbtn{background:var(--card);border-radius:24px;padding:14px 18px;font-size:20px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:120px}
+.homebtns{display:flex;gap:10px;justify-content:center}
+.bigbtn{background:var(--card);border-radius:24px;padding:14px 8px;font-size:20px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;max-width:140px}
 .bigbtn span{font-size:40px}
 
 /* lesson */
@@ -97,12 +97,14 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 
 /* balloons */
 .sky{position:absolute;inset:0}
-.balloon{position:absolute;bottom:-160px;width:96px;height:118px;border-radius:50% 50% 48% 48%/55% 55% 45% 45%;display:grid;place-items:center;font-size:50px;
-  animation:rise 9s linear infinite;box-shadow:inset -12px -14px 0 #0002}
+/* шарики влетают снизу и дальше покачиваются на месте — за экран не улетают */
+.balloon{position:absolute;width:96px;height:118px;border-radius:50% 50% 48% 48%/55% 55% 45% 45%;display:grid;place-items:center;font-size:50px;
+  animation:risein 1.4s cubic-bezier(.2,.8,.3,1) both,bob 3s ease-in-out infinite;box-shadow:inset -12px -14px 0 #0002}
 .balloon::after{content:"";position:absolute;bottom:-38px;left:50%;width:2px;height:38px;background:#fff8}
 .balloon.pop{animation:pop .35s forwards}
 .balloon.no{filter:brightness(.6)}
-@keyframes rise{from{transform:translateY(0)}to{transform:translateY(calc(-100dvh - 220px))}}
+@keyframes risein{from{transform:translateY(110dvh)}to{transform:none}}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-16px) rotate(3deg)}}
 @keyframes pop{to{transform:scale(1.8);opacity:0}}
 
 /* memory */
@@ -150,6 +152,63 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 @keyframes fall{to{transform:translateY(105dvh) rotate(720deg)}}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#000c;padding:10px 16px;border-radius:12px;font-size:15px;z-index:100;max-width:90%;text-align:center}
 .pop{animation:revealIn .5s cubic-bezier(.2,1.6,.4,1)}
+
+/* танец Lumi */
+.lumi.dance{animation:dance 1.6s ease-in-out}
+@keyframes dance{0%,100%{transform:none}15%{transform:translateY(-14px) rotate(-14deg)}30%{transform:scale(1.1,.9)}45%{transform:translateY(-14px) rotate(14deg)}60%{transform:scale(1.1,.9)}75%{transform:translateY(-20px) rotate(-8deg) scale(1.05)}}
+.note{position:fixed;font-size:30px;pointer-events:none;z-index:98;color:var(--accent);animation:noteup 1.4s ease-out both}
+@keyframes noteup{from{opacity:1;transform:none}to{opacity:0;transform:translate(var(--dx),-100px) rotate(20deg)}}
+.lumi.nope{animation:shake .5s}
+
+/* покорми Lumi */
+.feedlumi .lumi{width:180px;height:180px}
+.lumi.eat .mouth{animation:chomp .16s ease-in-out 6 alternate}
+@keyframes chomp{from{transform:scale(1,.6)}to{transform:scale(1.5,2.6)}}
+.feed .tile{touch-action:none}
+.tile.drag{z-index:5;box-shadow:0 14px 24px #0009}
+.tile.fly{transition:transform .45s ease-in,opacity .45s ease-in;opacity:0;pointer-events:none}
+.tile.back{transition:transform .35s cubic-bezier(.2,1.4,.4,1)}
+
+/* мини-диалоги */
+.q{font-size:34px;font-weight:900;text-align:center}
+.hint{font-size:18px;color:var(--muted);font-weight:700;text-align:center;margin-top:-8px}
+.ans{background:var(--card);border-radius:18px;padding:10px 18px;font-size:26px;font-weight:900;color:var(--teal);text-align:center}
+
+/* знакомство */
+.colors{display:flex;flex-wrap:wrap;gap:16px;justify-content:center}
+.colors button{width:66px;height:66px;border-radius:50%;box-shadow:0 6px 0 #0006}
+.colors button.on{outline:5px solid #fff}
+.names{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;width:100%}
+.names button{background:var(--card);border-radius:18px;padding:14px 4px;font-size:22px;font-weight:900}
+.names button.on{background:var(--accent);color:#3a2600}
+.kidname{font-size:46px;font-weight:900}
+.obinput{background:var(--bg2);border:2px solid var(--card2);color:var(--text);border-radius:14px;padding:12px;font-size:26px;width:80%;text-align:center;user-select:text;-webkit-user-select:text}
+.link{background:none;color:var(--muted);font-size:18px;font-weight:800;padding:8px}
+
+/* карта путешествия */
+.map{flex:1;overflow-y:auto;overflow-x:hidden;padding:30px 0 80px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.node{position:relative;display:flex;flex-direction:column;align-items:center;transform:translateX(var(--x))}
+.stone{width:28px;height:28px;border-radius:50%;background:var(--card);box-shadow:0 4px 0 #10173a}
+.stone.done{background:var(--accent);box-shadow:0 4px 0 #c98400}
+.isl{width:160px;padding:10px 8px 14px;border-radius:46% 54% 48% 52%/58% 58% 42% 42%;background:radial-gradient(circle at 50% 35%,#3ccf8e,#1f7a5c);box-shadow:0 8px 0 #0d4a3a,0 0 0 8px #5eead422;text-align:center}
+.isl .ie{font-size:58px;line-height:1.15}
+.isl b{display:block;font-size:20px;font-weight:900}
+.isl .iw{font-size:20px;display:flex;flex-wrap:wrap;justify-content:center;gap:3px;margin-top:4px}
+.isl.lock{background:var(--card);box-shadow:0 8px 0 #10173a;opacity:.55}
+.isl.new{animation:revealIn 1s cubic-bezier(.2,1.6,.4,1)}
+.me{position:absolute;bottom:50%;left:-34px;z-index:3;pointer-events:none}
+.lumi.tiny{width:72px;height:72px}
+.lumi.tiny .hat{--s:72px}
+.mapbtn{position:absolute;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:5;box-shadow:0 6px 20px #000a}
+
+/* диплом */
+.dip{margin:6px auto;background:linear-gradient(160deg,#fff7d6,#ffe08a);color:#3a2600;border-radius:24px;padding:16px 12px;text-align:center;box-shadow:0 0 0 6px #ffd34d55,0 12px 30px #0008}
+.dip h1{margin:0;font-size:34px;letter-spacing:3px}
+.dip .kid{font-size:38px;font-weight:900;color:#b4234f}
+.dip p{margin:4px 0;font-size:20px;font-weight:800}
+.dw{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:10px 0}
+.dw span.dwi{display:flex;flex-direction:column;align-items:center;font-size:36px;min-width:64px}
+.dw small{font-size:15px;font-weight:900}
 </style>
 </head>
 <body>
@@ -295,11 +354,33 @@ const STICKERS=[['🦄','unicorn'],['🐉','dragon'],['🦖','dinosaur'],['🐙'
 const HATS=[{e:'🎀',p:5},{e:'🧢',p:10},{e:'🌸',p:15},{e:'👒',p:20},{e:'🎓',p:30},{e:'👑',p:40},{e:'🎩',p:50},{e:'⛑️',p:60},{e:'🌟',p:80}];
 const PRAISE=['Brawo!','Super!','Świetnie!','Ekstra!','Tak jest!','Wow!','Pięknie!','Mistrzyni!'];
 const INTERVAL=[0,1,2,4,7,14];
+// цвета Lumi (выбираются при знакомстве): светлый, основной, тёмный, ручки; n — как Lumi называет цвет по-английски
+const COLORS=[{n:'mint',l:'#9ff7e4',m:'#3cc8b4',d:'#2a8f9e',a:'#2fa9a6'},{n:'pink',l:'#ffd1e6',m:'#f472b6',d:'#be3a83',a:'#e0559c'},
+{n:'purple',l:'#e3d4ff',m:'#a78bfa',d:'#6d4bd8',a:'#8b6cf0'},{n:'blue',l:'#cfe6ff',m:'#60a5fa',d:'#2f6fd0',a:'#4a8be8'},
+{n:'orange',l:'#ffe0b8',m:'#fb923c',d:'#c2601a',a:'#e67a2c'},{n:'green',l:'#d6ffc9',m:'#4ade80',d:'#1f9d55',a:'#36bf6c'},{n:'yellow',l:'#fff3b0',m:'#facc15',d:'#b88a00',a:'#e0b40d'}];
+const LNAMES=['Lumi','Bubu','Pipo','Kiki','Tofi','Nuni'];
+// карта: острова по очереди, STEPS уроков (шагов) на остров
+const ISLANDS=[['🐮','Farma'],['🍳','Kuchnia'],['🌳','Las'],['🏖️','Plaża'],['🎪','Cyrk'],['🏰','Zamek'],['🦁','Dżungla'],['🐧','Biegun'],
+['🌋','Wulkan'],['🧁','Cukiernia'],['🐠','Rafa'],['🚀','Kosmos'],['🌈','Tęcza']];
+const STEPS=4,MAXPOS=(ISLANDS.length-1)*STEPS;
+// мини-диалоги: q — вопрос Lumi, a — ответ-образец, pl — подсказка, k — ключевые слова для «точного» ответа, r — реакция Lumi. {kid} = имя ребёнка
+const TALKS=[
+{e:'👋',q:'Hello!',a:'Hello!',pl:'Cześć!',k:['hello','hi','hey'],r:'Hello, {kid}! I am happy to see you!'},
+{e:'🙋',q:"What's your name?",a:'My name is {kid}.',pl:'Jak masz na imię?',k:['name','my','i am','im'],r:'Nice to meet you, {kid}!',kid:1},
+{e:'😊',q:'How are you?',a:"I'm fine, thank you!",pl:'Jak się masz?',k:['fine','good','thank','great','ok'],r:'Great! Me too!'},
+{e:'😄',q:'Are you happy?',a:'Yes, I am!',pl:'Jesteś wesoła?',k:['yes','am','happy'],r:'Me too! Hooray!'},
+{e:'🍦',q:'Do you like ice cream?',a:'Yes, I do!',pl:'Lubisz lody?',k:['yes','do','no'],r:'Me too! Yummy!'},
+{e:'🙏',q:'Thank you!',a:"You're welcome!",pl:'Dziękuję! — Proszę bardzo!',k:['welcome','your','you'],r:'You are so nice!'},
+{e:'☀️',q:'Good morning!',a:'Good morning!',pl:'Dzień dobry!',k:['good','morning'],r:'What a nice day!'}];
+const FEEDABLE=['jedzenie','dom','ubrania','pojazdy','zwierzęta','kolory','liczby'];
+const VOLS=[.3,.65,1],VOLICON=['🔈','🔉','🔊'];
 
 /* ============ СОХРАНЕНИЕ ============ */
 const KEY='lumi_slowka_v1';
-const DEF={name:'Lumi',perDay:5,stars:0,streak:0,lastDay:null,extra:false,sessions:0,words:{},stickers:{},hats:[],hat:null,introSeen:false};
+const DEF={name:'Lumi',perDay:5,stars:0,streak:0,lastDay:null,extra:false,sessions:0,words:{},stickers:{},hats:[],hat:null,introSeen:false,
+  kid:'',color:0,onboarded:false,trip:null,isl:{},log:[],certDay:null,vol:2,music:true,talkSeen:false};
 let S; try{S=Object.assign({},DEF,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){S={...DEF}}
+S.isl={...S.isl};S.log=[...S.log];if(S.trip==null)S.trip=S.sessions||0;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 const today=()=>new Date().toLocaleDateString('sv');
 const addDays=(d,n)=>{const x=new Date(d+'T12:00');x.setDate(x.getDate()+n);return x.toLocaleDateString('sv')};
@@ -311,6 +392,12 @@ const app=$('#app');
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 const rnd=a=>a[Math.random()*a.length|0];
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const click=el=>new Promise(r=>el.addEventListener('click',()=>r(el),{once:true}));
+const vol=()=>VOLS[S.vol]??1;
+const kidC=()=>S.kid?', '+S.kid:'';   // «Brawo, Zosia!»
+const cleanName=s=>(s||'').replace(/[^\p{L} \-]/gu,'').replace(/\s+/g,' ').trim().slice(0,14);
+const cap=s=>s.replace(/(^|[ \-])\p{L}/gu,m=>m.toUpperCase());
+const plN=(n,a,b,c)=>n===1?a:(n%10>=2&&n%10<=4&&(n%100<12||n%100>14))?b:c;   // польские формы: 1 słówko, 2 słówka, 5 słówek
 function pic(id){const p=W[id].p;
   if(p.startsWith('#'))return `<span class="pic"><span class="colorblob" style="background:${p}"></span></span>`;
   if(/^\d+$/.test(p))return `<span class="pic numpic">${p}</span>`;
@@ -322,10 +409,24 @@ function confetti(n=40){const c=['#ffd34d','#5eead4','#f9a8d4','#a78bfa','#4ade8
 
 /* звуки без файлов */
 let AC;function tone(f,d=.15,type='sine',v=.15,delay=0){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t=AC.currentTime+delay;
-  const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+  const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v*vol(),t);g.gain.exponentialRampToValueAtTime(.001,t+d);
   o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d)}catch(e){}}
 const sfx={ding(){tone(880,.18);tone(1320,.25,'sine',.15,.1)},oops(){tone(300,.2,'triangle',.12);tone(220,.25,'triangle',.12,.12)},
   pop(){tone(600,.08,'square',.08);tone(1200,.1,'sine',.1,.03)},tada(){[523,659,784,1047].forEach((f,i)=>tone(f,.3,'sine',.14,i*.12))},flip(){tone(500,.06,'triangle',.08)}};
+
+/* тихая фоновая мелодия (тоже без файлов). Пока Lumi говорит — тише, пока слушает микрофон — молчит */
+const MEL=[659,0,784,0,880,784,659,0,587,0,659,0,523,0,0,0,659,0,784,0,880,0,1047,880,784,0,659,0,587,0,0,0];
+const BASS={0:131,8:98,16:110,24:98};
+let MG=null,mT=null,mI=0,duckTalk=false,duckMic=false;
+function musicLevel(fast){if(!MG)return;const v=S.music&&!duckMic?.05*vol()*(duckTalk?.35:1):0;MG.gain.setTargetAtTime(v,AC.currentTime,fast?.03:.25)}
+function mnote(f,d,type,v,t){const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(v,t+.03);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(MG);o.start(t);o.stop(t+d+.05)}
+function startMusic(){if(!S.music||mT||document.hidden)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();AC.resume();
+  if(!MG){MG=AC.createGain();MG.gain.value=0;MG.connect(AC.destination)}musicLevel();
+  mT=setInterval(()=>{const t=AC.currentTime+.05,i=mI++%MEL.length;if(MEL[i])mnote(MEL[i],.7,'triangle',.5,t);if(BASS[i])mnote(BASS[i],2.4,'sine',.6,t)},330)}catch(e){}}
+function stopMusic(){clearInterval(mT);mT=null;if(MG)MG.gain.setTargetAtTime(0,AC.currentTime,.05)}
+document.addEventListener('pointerdown',startMusic);   // браузер разрешает звук только после первого касания
+document.addEventListener('visibilitychange',()=>document.hidden?stopMusic():startMusic());
 
 /* ============ ГОЛОС ============ */
 let enV=null,plV=null;
@@ -335,12 +436,12 @@ function pickVoices(){const v=speechSynthesis.getVoices();
 if('speechSynthesis' in window){pickVoices();speechSynthesis.onvoiceschanged=pickVoices}
 let RUN=0; const STOP={stop:1};
 function guard(my){if(my!==RUN)throw STOP}
-function talking(on){document.querySelectorAll('.lumi').forEach(l=>l.classList.toggle('talk',on))}
+function talking(on){document.querySelectorAll('.lumi').forEach(l=>l.classList.toggle('talk',on));duckTalk=on;musicLevel()}
 function say(text,lang='pl',rate){return new Promise(res=>{
   if(!('speechSynthesis' in window)){res();return}
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(text);u.lang=lang==='en'?'en-US':'pl-PL';
-  const v=lang==='en'?enV:plV;if(v)u.voice=v;u.rate=rate||(lang==='en'?.8:1.02);u.pitch=lang==='en'?1.05:1.15;
+  const v=lang==='en'?enV:plV;if(v)u.voice=v;u.rate=rate||(lang==='en'?.8:1.02);u.pitch=lang==='en'?1.05:1.15;u.volume=vol();
   let done=false;const fin=()=>{if(done)return;done=true;clearTimeout(t);talking(false);setTimeout(res,120)};
   u.onend=fin;u.onerror=fin;const t=setTimeout(fin,1800+text.length*110);
   talking(true);speechSynthesis.speak(u);})}
@@ -349,15 +450,19 @@ async function sayE(my,text){await say(text,'en');guard(my)}
 
 /* ============ РАСПОЗНАВАНИЕ РЕЧИ ============ */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-function listen(){return new Promise(res=>{
-  if(!SR){res({ok:false,reason:'nosr'});return}
-  const r=new SR();r.lang='en-US';r.maxAlternatives=5;r.interimResults=false;r.continuous=false;
+function listen(lang){return new Promise(res0=>{
+  if(!SR){res0({ok:false,reason:'nosr'});return}
+  duckMic=true;musicLevel(true);const res=v=>{duckMic=false;musicLevel();res0(v)};
+  const r=new SR();r.lang=lang||'en-US';r.maxAlternatives=5;r.interimResults=false;r.continuous=false;
   let alts=null,err=null,ended=false;
   r.onresult=e=>{alts=[...e.results[0]].map(a=>a.transcript.toLowerCase())};
   r.onerror=e=>{err=e.error};
   r.onend=()=>{if(ended)return;ended=true;clearTimeout(t);res(alts?{ok:true,alts}:{ok:false,reason:err||'no-speech'})};
   const t=setTimeout(()=>{try{r.stop()}catch(e){}},7000);
   try{r.start()}catch(e){ended=true;res({ok:false,reason:'start'})}})}
+// для фраз: есть ли в услышанном хоть одно ключевое слово
+const norm=s=>s.toLowerCase().replace(/[^a-z0-9 ]/g,'').replace(/\s+/g,' ').trim();
+function hasKey(alts,keys){return alts.some(a=>{a=' '+norm(a)+' ';return keys.some(k=>a.includes(' '+norm(k)+' '))})}
 const NUM={one:'1',two:'2',three:'3',four:'4',five:'5',six:'6',seven:'7',eight:'8',nine:'9',ten:'10'};
 function lev(a,b){const m=[];for(let i=0;i<=a.length;i++){m[i]=[i];for(let j=1;j<=b.length;j++)m[i][j]=i?Math.min(m[i-1][j]+1,m[i][j-1]+1,m[i-1][j-1]+(a[i-1]===b[j-1]?0:1)):j}return m[a.length][b.length]}
 function matches(alts,id){const w=W[id].en.toLowerCase().replace(/[^a-z ]/g,'');const tol=w.length>5?2:1;
@@ -367,17 +472,19 @@ function matches(alts,id){const w=W[id].en.toLowerCase().replace(/[^a-z ]/g,'');
     return a.split(' ').some(t=>t.length>2&&lev(t,w)<=tol&&!w.includes(' '));})}
 
 /* ============ ПЕРСОНАЖ ============ */
-function lumiHTML(cls=''){return `<div class="lumi ${cls}" onclick="pokeLumi(this)">${S.hat?`<div class="hat">${S.hat}</div>`:''}
+// у каждого Lumi на экране свои id градиентов: иначе спрятанный Lumi «забирает» цвет у видимого
+let LID=0;
+function lumiHTML(cls=''){const C=COLORS[S.color]||COLORS[0],k=++LID;return `<div class="lumi ${cls}" onclick="pokeLumi(this)">${S.hat?`<div class="hat">${S.hat}</div>`:''}
 <svg viewBox="0 0 200 200"><defs>
-<radialGradient id="lg" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#9ff7e4"/><stop offset=".6" stop-color="#3cc8b4"/><stop offset="1" stop-color="#2a8f9e"/></radialGradient>
-<radialGradient id="lb" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff6c2"/><stop offset="1" stop-color="#ffc93c"/></radialGradient></defs>
+<radialGradient id="lg${k}" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="${C.l}"/><stop offset=".6" stop-color="${C.m}"/><stop offset="1" stop-color="${C.d}"/></radialGradient>
+<radialGradient id="lb${k}" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff6c2"/><stop offset="1" stop-color="#ffc93c"/></radialGradient></defs>
 <ellipse cx="100" cy="192" rx="52" ry="7" fill="#000" opacity=".3"/>
-<path d="M100 40 Q96 18 108 8" stroke="#2a8f9e" stroke-width="5" fill="none" stroke-linecap="round"/>
-<circle class="antball" cx="108" cy="8" r="9" fill="url(#lb)"/>
-<ellipse cx="44" cy="128" rx="16" ry="12" fill="#2fa9a6" transform="rotate(-30 44 128)"/>
-<ellipse cx="156" cy="128" rx="16" ry="12" fill="#2fa9a6" transform="rotate(30 156 128)"/>
-<ellipse cx="78" cy="182" rx="16" ry="9" fill="#2a8f9e"/><ellipse cx="122" cy="182" rx="16" ry="9" fill="#2a8f9e"/>
-<ellipse cx="100" cy="112" rx="66" ry="70" fill="url(#lg)"/>
+<path d="M100 40 Q96 18 108 8" stroke="${C.d}" stroke-width="5" fill="none" stroke-linecap="round"/>
+<circle class="antball" cx="108" cy="8" r="9" fill="url(#lb${k})"/>
+<ellipse cx="44" cy="128" rx="16" ry="12" fill="${C.a}" transform="rotate(-30 44 128)"/>
+<ellipse cx="156" cy="128" rx="16" ry="12" fill="${C.a}" transform="rotate(30 156 128)"/>
+<ellipse cx="78" cy="182" rx="16" ry="9" fill="${C.d}"/><ellipse cx="122" cy="182" rx="16" ry="9" fill="${C.d}"/>
+<ellipse cx="100" cy="112" rx="66" ry="70" fill="url(#lg${k})"/>
 <ellipse cx="100" cy="140" rx="36" ry="30" fill="#c9fff2" opacity=".35"/>
 <ellipse cx="62" cy="122" rx="11" ry="7" fill="#ff8fb1" opacity=".7"/><ellipse cx="138" cy="122" rx="11" ry="7" fill="#ff8fb1" opacity=".7"/>
 <g class="eyes"><ellipse cx="78" cy="98" rx="14" ry="17" fill="#fff"/><circle cx="80" cy="101" r="9" fill="#1b1f3b"/><circle cx="83" cy="97" r="3.5" fill="#fff"/>
@@ -390,28 +497,130 @@ window.pokeLumi=async el=>{if(document.querySelector('.stage'))return;el.classLi
   if(el.classList.contains('sleep')){bubble('Zzz… chrrr…');say('Zzz… Jestem śpiący. Wróć jutro!');return}
   const t=rnd(POKES).replace('{n}',S.name);bubble(t);say(t)};
 function bubble(t){const b=$('.bubble');if(b)b.textContent=t}
-function jump(){const l=$('.lumi');if(!l)return;l.classList.remove('jump');void l.offsetWidth;l.classList.add('jump')}
+function jump(){document.querySelectorAll('.lumi').forEach(l=>{l.classList.remove('jump');void l.offsetWidth;l.classList.add('jump')})}
+const shownLumi=()=>[...document.querySelectorAll('.lumi')].find(l=>l.offsetParent);
+// танец после трёх правильных ответов подряд
+let combo=0;
+function oops(){combo=0;sfx.oops()}
+async function dance(my){document.querySelectorAll('.lumi').forEach(l=>{l.classList.remove('dance','jump');void l.offsetWidth;l.classList.add('dance')});
+  [659,784,1047,784,1047,1319].forEach((f,i)=>tone(f,.18,'square',.05,i*.13));confetti(50);
+  const l=shownLumi();if(l){const r=l.getBoundingClientRect();for(let i=0;i<6;i++){const n=document.createElement('div');n.className='note';n.textContent=rnd(['♪','♫','🎵']);
+    n.style.left=r.left+r.width*Math.random()+'px';n.style.top=r.top+r.height*.3+'px';n.style.setProperty('--dx',(Math.random()*80-40)+'px');n.style.animationDelay=i*.15+'s';
+    document.body.append(n);setTimeout(()=>n.remove(),2400)}}
+  await sayP(my,`Trzy razy dobrze${kidC()}! Tańczę!`)}
 
 /* ============ ЭКРАНЫ ============ */
 function stopAll(){RUN++;try{speechSynthesis.cancel()}catch(e){}talking(false)}
-function topbar(extra=''){return `<div class="top"><div class="pill">⭐ ${S.stars}</div><div class="pill">☀️ ${S.streak}</div><div class="spacer"></div>${extra}</div>`}
+const volBtn=()=>`<button class="iconbtn" id="vol">${VOLICON[S.vol]}</button>`;
+// кнопка громкости: 🔊 → 🔉 → 🔈 → 🔊 (совсем без звука не бывает — иначе ребёнок не услышит Lumi)
+app.addEventListener('click',e=>{const b=e.target.closest('#vol');if(!b)return;S.vol=(S.vol+2)%3;save();b.textContent=VOLICON[S.vol];musicLevel();tone(880,.18)});
+function topbar(extra=''){return `<div class="top"><div class="pill">⭐ ${S.stars}</div><div class="pill">☀️ ${S.streak}</div><div class="spacer"></div>${volBtn()}${extra}</div>`}
 
 function home(){stopAll();const can=canPlay();
   app.innerHTML=`${topbar('<button class="iconbtn gear" id="gear">⚙️</button>')}
   <div class="home">
-    <div class="bubble">${can?(S.sessions?`Cześć! Gotowa na nowe słówka?`:`Cześć! Jestem ${S.name}. Kliknij mnie!`):`Zzz… ${S.name} śpi. Wróć jutro!`}</div>
+    <div class="bubble">${can?(S.sessions?`Cześć${kidC()}! Gotowa na nowe słówka?`:`Cześć${kidC()}! Jestem ${S.name}. Kliknij mnie!`):`Zzz… ${S.name} śpi. Wróć jutro${kidC()}!`}</div>
     <div class="lumiwrap">${lumiHTML(can?'':'sleep')}${can?'':'<div class="zzz">z</div>'}</div>
     ${can?`<button class="play" id="play">▶ Graj!</button>`:`<div style="height:30px"></div>`}
-    <div class="homebtns"><button class="bigbtn" id="alb"><span>📒</span>Naklejki</button><button class="bigbtn" id="war"><span>🎩</span>Szafa</button></div>
+    <div class="homebtns"><button class="bigbtn" id="map"><span>🗺️</span>Mapa</button><button class="bigbtn" id="alb"><span>📒</span>Naklejki</button><button class="bigbtn" id="war"><span>🎩</span>Szafa</button></div>
   </div>`;
   if(can)$('#play').onclick=startSession;
-  $('#alb').onclick=album;$('#war').onclick=wardrobe;
+  $('#map').onclick=mapScreen;$('#alb').onclick=album;$('#war').onclick=wardrobe;
   // вход для родителей: удерживать шестерёнку 2 секунды
   const g=$('#gear');let ht;const st=e=>{e.preventDefault();g.classList.add('holding');ht=setTimeout(()=>{g.classList.remove('holding');parent()},2000)};
   const en=()=>{clearTimeout(ht);g.classList.remove('holding')};
   g.addEventListener('pointerdown',st);['pointerup','pointerleave','pointercancel'].forEach(x=>g.addEventListener(x,en));
   g.addEventListener('contextmenu',e=>e.preventDefault());
 }
+
+/* ============ ЗНАКОМСТВО (первый запуск) ============ */
+function parseName(t){t=t.toLowerCase().replace(/^(mam na imię|nazywam się|ja jestem|jestem|ja mam na imię|to)\s+/,'');return cap(cleanName(t.split(' ')[0]))}
+async function onboard(){stopAll();const my=RUN;
+  app.innerHTML=`<div class="top"><div class="spacer"></div>${volBtn()}</div><div class="bubble"></div><div class="lumiwrap">${lumiHTML()}</div><div class="stage" id="stage"></div>`;
+  try{
+    // 1) имя ребёнка: говорит в микрофон (по-польски) или мама вписывает
+    stage().innerHTML=`<div class="kidname" id="kn"></div><div class="row" id="r1"><button class="mic">🎤</button></div>
+      <div class="row yn hidden" id="r2"><button class="yes">👍</button><button class="nob">👎</button></div>
+      <input class="obinput hidden" id="kin" maxlength="14" placeholder="Imię…" autocomplete="off"><button class="next hidden" id="kok">OK ✓</button>
+      <button class="link" id="kbd">⌨️ wpisz</button><button class="link hidden" id="skip">Pomiń ➜</button>`;
+    const show=(sel,on)=>$(sel).classList.toggle('hidden',!on);
+    const typing=()=>{show('#kin',1);show('#kok',1);show('#skip',1);show('#kbd',0)};
+    $('#kin').onkeydown=e=>{if(e.key==='Enter')$('#kok').click()};
+    if(!SR)typing();
+    let name='',fails=0;
+    await sayP(my,'Cześć! Będziemy przyjaciółmi. Jak masz na imię?');
+    await sayP(my,SR?'Naciśnij mikrofon i powiedz swoje imię!':'Poproś mamę, żeby wpisała twoje imię.');
+    for(;;){const b=await tapOne('.mic,#kbd,#kok,#skip,.yes,.nob');guard(my);
+      if(b.id==='kbd'){typing();$('#kin').focus();continue}
+      if(b.id==='skip'){name='';break}
+      if(b.id==='kok'){const v=cap(cleanName($('#kin').value));if(v){name=v;break}continue}
+      if(b.classList.contains('yes'))break;
+      if(b.classList.contains('nob')){name='';$('#kn').textContent='';show('#r2',0);show('#r1',1);await sayP(my,'Ups! Powiedz jeszcze raz.');continue}
+      b.classList.add('on');bubble('Słucham… 👂');const r=await listen('pl-PL');b.classList.remove('on');guard(my);
+      const v=r.ok?parseName(r.alts[0]):'';
+      if(v){name=v;$('#kn').textContent=v+'?';show('#r1',0);show('#r2',1);await sayP(my,`${v}? Dobrze słyszę?`);continue}
+      if(r.reason==='not-allowed'||r.reason==='service-not-allowed')toast('Нужно разрешить микрофон для этого сайта в Chrome',5000);
+      if(++fails>=2){typing();await sayP(my,'Poproś mamę, żeby wpisała twoje imię.')}else await sayP(my,'Nie słyszę cię. Powiedz głośniej!')}
+    S.kid=name;save();sfx.ding();jump();
+    // 2) цвет Lumi
+    stage().innerHTML=`<div class="colors">${COLORS.map((c,i)=>`<button data-c="${i}" class="${i===S.color?'on':''}" style="background:${c.m}"></button>`).join('')}</div><button class="next" id="cok">Gotowe ✓</button>`;
+    await sayP(my,`Super${kidC()}! Jaki kolor mam mieć? Wybierz!`);
+    for(;;){const b=await tapOne('[data-c],#cok');guard(my);if(b.id==='cok')break;
+      S.color=+b.dataset.c;save();$('.lumiwrap').innerHTML=lumiHTML();jump();sfx.pop();
+      stage().querySelectorAll('[data-c]').forEach(x=>x.classList.toggle('on',x===b));say(COLORS[S.color].n,'en')}
+    // 3) имя Lumi
+    stage().innerHTML=`<div class="names">${LNAMES.map(n=>`<button data-n="${n}" class="${n===S.name?'on':''}">${n}</button>`).join('')}</div><button class="next" id="nok">Gotowe ✓</button>`;
+    await sayP(my,'A jak mam mieć na imię?');
+    for(;;){const b=await tapOne('[data-n],#nok');guard(my);if(b.id==='nok')break;
+      S.name=b.dataset.n;save();jump();sfx.pop();stage().querySelectorAll('[data-n]').forEach(x=>x.classList.toggle('on',x===b));say(`Jestem ${S.name}!`)}
+    S.onboarded=true;save();stage().innerHTML='';sfx.tada();confetti(70);jump();
+    await sayP(my,`Hurra! Jestem ${S.name}${kidC()}. Ruszamy w podróż!`);
+    home();
+  }catch(e){if(e!==STOP)console.error(e)}}
+
+/* ============ КАРТА ПУТЕШЕСТВИЯ ============ */
+const isle=pos=>Math.floor(Math.min(pos,MAXPOS)/STEPS);
+const node=(p,inner)=>`<div class="node" data-pos="${p}" style="--x:${Math.round(Math.sin(p*.9)*60)}px">${inner}</div>`;
+function islHTML(i,open,cls=''){const[e,n]=ISLANDS[i];const ws=(S.isl[i]||[]).filter(id=>W[id]).slice(-10);
+  return `<div class="isl ${open?'':'lock'} ${cls}"><div class="ie">${open?e:'❔'}</div><b>${open?n:'???'}</b>${open&&ws.length?`<div class="iw">${ws.map(pic).join('')}</div>`:''}</div>`}
+function mapHTML(pos){let h='';
+  for(let i=0;i<ISLANDS.length;i++){h+=node(i*STEPS,islHTML(i,i*STEPS<=pos));
+    if(i<ISLANDS.length-1)for(let s=1;s<STEPS;s++){const p=i*STEPS+s;h+=node(p,`<div class="stone ${p<=pos?'done':''}"></div>`)}}
+  return h}
+function putMe(pos,anim){const old=$('.me');old&&old.remove();const n=$(`.node[data-pos="${Math.min(pos,MAXPOS)}"]`);if(!n)return;
+  n.insertAdjacentHTML('beforeend',`<div class="me">${lumiHTML('tiny')}</div>`);n.scrollIntoView({block:'center',behavior:anim?'smooth':'auto'});if(anim)jump()}
+function mapLine(pos){if(pos>=MAXPOS)return 'Jesteśmy na ostatniej wyspie! Jesteś super!';
+  const left=STEPS-pos%STEPS;return `${pos%STEPS?'':`Jesteśmy na wyspie ${ISLANDS[isle(pos)][1]}! `}Jeszcze ${left===1?'jedna lekcja':left+' lekcje'} do nowej wyspy!`}
+function mapScreen(){stopAll();
+  app.innerHTML=`${topbar('<button class="iconbtn" id="back">🏠</button>')}<div class="bubble"></div><div class="map">${mapHTML(S.trip)}</div>`;
+  $('#back').onclick=home;putMe(S.trip);const t=mapLine(S.trip);bubble(t);setTimeout(()=>say(t),300)}
+// после урока: Lumi делает шаг по тропинке; каждые STEPS шагов — новый остров
+async function travel(my,fresh){const from=Math.min(S.trip,MAXPOS),i0=isle(from);
+  if(fresh.length)S.isl[i0]=(S.isl[i0]||[]).concat(fresh);
+  S.trip++;save();const to=Math.min(S.trip,MAXPOS);
+  app.innerHTML=`<div class="top"><div class="spacer"></div>${volBtn()}</div><div class="bubble"></div><div class="map">${mapHTML(from)}</div>`;
+  putMe(from);await sleep(1100);guard(my);
+  if(to===from){await sayP(my,mapLine(to));return}
+  const n=$(`.node[data-pos="${to}"]`);
+  if(to%STEPS===0){n.innerHTML=islHTML(to/STEPS,true,'new');putMe(to,true);sfx.tada();confetti(90);
+    await sleep(400);await sayP(my,`Hurra! Nowa wyspa: ${ISLANDS[to/STEPS][1]}!`)}
+  else{n.querySelector('.stone').classList.add('done');putMe(to,true);sfx.flip();tone(784,.15,'sine',.12,.1);await sleep(500);guard(my);
+    await sayP(my,`Hop! ${mapLine(to)}`)}}
+
+/* ============ ДИПЛОМ ЗА НЕДЕЛЮ ============ */
+function weekData(){const from=addDays(today(),-6),L=S.log.filter(x=>x.d>=from);
+  return {n:L.length,stars:L.reduce((s,x)=>s+(x.stars||0),0),words:[...new Set(L.flatMap(x=>x.fresh||[]))].filter(id=>W[id])}}
+function certDue(){if(!S.certDay){S.certDay=today();save();return false}return today()>=addDays(S.certDay,7)&&weekData().n>0}
+async function diploma(my){const w=weekData();
+  app.innerHTML=`<div class="lessonhead">${lumiHTML('small')}<div class="bubble"></div></div>
+  <div class="scroll"><div class="dip pop"><div style="font-size:60px">🏅</div><h1>DYPLOM</h1><div class="kid">${S.kid||'Super uczennica'}</div>
+   <p>W tym tygodniu poznała</p><p style="font-size:30px">${w.words.length} ${plN(w.words.length,'słówko','słówka','słówek')}</p>
+   <div class="dw">${w.words.map(id=>`<span class="dwi">${pic(id)}<small>${W[id].en}</small></span>`).join('')}</div>
+   <p>🎮 ${w.n} ${plN(w.n,'lekcja','lekcje','lekcji')} · ⭐ ${w.stars}</p><p style="font-size:16px">${today()}</p></div></div>
+  <button class="next" id="dhome" style="margin:10px auto 0">🏠 Gotowe</button>`;
+  sfx.tada();confetti(60);
+  try{await sayP(my,`Brawo${kidC()}! To twój dyplom!`);await sayP(my,'Pokaż go mamie!');await click($('#dhome'));guard(my);home()}
+  catch(e){if(e!==STOP)console.error(e)}}
 
 function album(){stopAll();const have=Object.keys(S.stickers).length;
   app.innerHTML=`${topbar('<button class="iconbtn" id="back">🏠</button>')}<div class="title">📒 Naklejki ${have}/${STICKERS.length}</div>
@@ -434,7 +643,7 @@ function wardrobe(){stopAll();
     S.hat=e||null;save();wardrobe();if(e)say('Ślicznie wyglądam!')});}
 
 /* ============ УРОК ============ */
-function stageScreen(){app.innerHTML=`<div class="lessontop"><button class="iconbtn" id="x">✕</button><div class="progress"><i id="pg"></i></div><div class="pill">⭐ <span id="stars">${S.stars}</span></div></div>
+function stageScreen(){app.innerHTML=`<div class="lessontop"><button class="iconbtn" id="x">✕</button><div class="progress"><i id="pg"></i></div><div class="pill">⭐ <span id="stars">${S.stars}</span></div>${volBtn()}</div>
   <div class="lessonhead">${lumiHTML('small')}<div class="bubble"></div></div><div class="stage" id="stage"></div>`;
   $('#x').onclick=home;}
 const stage=()=>$('#stage');
@@ -453,20 +662,23 @@ function distractors(id,n){const pool=known().filter(x=>x!==id);const same=pool.
   out=out.concat(shuffle(pool.filter(x=>!out.includes(x)&&W[x].p!==W[id].p))).slice(0,n);
   if(out.length<n)out=out.concat(shuffle(Object.keys(W).filter(x=>x!==id&&!out.includes(x)))).slice(0,n);
   return out.filter(x=>W[x].en!==W[id].en)}
-async function praise(my,big){sfx.ding();confetti(big?40:18);jump();await sayP(my,rnd(PRAISE))}
+async function praise(my,big){
+  if(big&&++combo%3===0){sfx.ding();await dance(my);return}
+  sfx.ding();confetti(big?40:18);jump();const p=rnd(PRAISE);await sayP(my,S.kid&&Math.random()<.4?p.replace('!',kidC()+'!'):p)}
 
-/* «повтори» — ребёнок говорит в микрофон. Засчитываем любую попытку. */
-async function speakTurn(my,id){const st=stage();
+/* «повтори» — ребёнок говорит в микрофон. Засчитываем любую попытку.
+   id — слово, или фраза {en, ok(alts)} для мини-диалогов */
+async function speakTurn(my,id){const st=stage();const T=typeof id==='string'?{en:W[id].en,ok:a=>matches(a,id)}:id;
   const next=st.querySelector('.next');if(!SR&&next)next.classList.remove('hidden');
   for(let tries=0;tries<3;){
     const b=await tapOne('.mic,.again,.next');guard(my);
-    if(b.classList.contains('again')){await sayE(my,W[id].en);continue}
+    if(b.classList.contains('again')){await sayE(my,T.en);continue}
     if(b.classList.contains('next'))return 'none';
     if(!SR){toast('Этот браузер не умеет слушать. Нажми «Dalej».');continue}
     tries++;b.classList.add('on');bubble('Słucham… 👂');const r=await listen();b.classList.remove('on');guard(my);
     if(r.reason==='not-allowed'||r.reason==='service-not-allowed'){toast('Нужно разрешить микрофон для этого сайта в Chrome',5000);next&&next.classList.remove('hidden');continue}
-    if(r.ok){if(matches(r.alts,id)){addStars(2);await praise(my,true);return 'good'}
-      addStars(1);sfx.ding();jump();await sayP(my,rnd(['Dobrze!','Prawie!','Ładnie!'])+' Posłuchaj jeszcze raz:');await sayE(my,W[id].en);return 'ok'}
+    if(r.ok){if(T.ok(r.alts)){addStars(2);await praise(my,true);return 'good'}
+      addStars(1);sfx.ding();jump();await sayP(my,rnd(['Dobrze!','Prawie!','Ładnie!'])+' Posłuchaj jeszcze raz:');await sayE(my,T.en);return 'ok'}
     if(r.reason==='network'){toast('Нет интернета для распознавания речи');}
     await sayP(my,'Nie słyszę cię. Powiedz głośniej!');next&&next.classList.remove('hidden');
   }
@@ -488,20 +700,76 @@ async function gamePick(my,targets,label){for(const id of targets){const w=W[id]
   for(;;){const b=await tapOne('.tile,.again');guard(my);
     if(b.classList.contains('again')){await sayE(my,w.en);continue}
     if(b.dataset.id===id){b.classList.add('ok');if(first)addStars(1);await praise(my,first);break}
-    first=false;b.classList.add('no','gone');sfx.oops();await sayE(my,w.en)}
+    first=false;b.classList.add('no','gone');oops();await sayE(my,w.en)}
   label&&grade(id,first?'good':'bad');step()}}
 
 async function gameBalloons(my,targets,label){const cols=['#fb7185','#60a5fa','#facc15','#4ade80','#c084fc','#fb923c'];
   for(const id of targets){const w=W[id];const opts=shuffle([id,...distractors(id,3)]);
-    stage().innerHTML=`<div class="sky">${opts.map((o,i)=>`<button class="balloon" data-id="${o}" style="left:${3+i*24}%;background:${cols[(i+targets.indexOf(id))%cols.length]};animation-delay:${-i*2.1-Math.random()}s;animation-duration:${8+Math.random()*2}s">${pic(o)}</button>`).join('')}</div>
+    stage().innerHTML=`<div class="sky">${opts.map((o,i)=>`<button class="balloon" data-id="${o}" style="left:calc((100% - 96px)*${i/3});top:${6+Math.random()*34}%;background:${cols[(i+targets.indexOf(id))%cols.length]};animation-delay:${i*.15}s,${-Math.random()*3}s;animation-duration:1.4s,${2.6+Math.random()*1.2}s">${pic(o)}</button>`).join('')}</div>
     <button class="again" style="position:absolute;bottom:6px;right:6px;z-index:3">🔊</button>`;
     bubble(`Przebij balon: ${w.en}!`);await say('Przebij balon','pl');guard(my);await sayE(my,w.en);
     let first=true;
     for(;;){const b=await tapOne('.balloon,.again');guard(my);
       if(b.classList.contains('again')){await sayE(my,w.en);continue}
       if(b.dataset.id===id){b.classList.add('pop');sfx.pop();if(first)addStars(1);await praise(my,first);break}
-      first=false;b.classList.add('no');sfx.oops();await sayE(my,w.en)}
+      first=false;b.classList.add('no');oops();await sayE(my,w.en)}
     label&&grade(id,first?'good':'bad');step()}}
+
+/* «Покорми Lumi»: Lumi просит предмет по-английски, ребёнок тащит его пальцем Lumi в рот (или просто нажимает) */
+const feedable=id=>FEEDABLE.includes(W[id].t);
+function wantText(id){const w=W[id];if(w.t==='jedzenie')return `I'm hungry! Give me the ${w.en}!`;
+  if(w.t==='kolory'||w.t==='liczby')return `Give me ${w.en}!`;return `Give me the ${w.en}, please!`}
+function backTile(t){t.classList.add('back');t.style.transform='';t._dx=t._dy=0}
+function dragTo(L){return new Promise(res=>{const st=stage();
+  const down=e=>{const a=e.target.closest('.again');if(a){st.removeEventListener('pointerdown',down);res(a);return}
+    const t=e.target.closest('.tile');if(!t||t.classList.contains('gone'))return;e.preventDefault();
+    const x0=e.clientX,y0=e.clientY;let moved=false;t.classList.remove('back');t.classList.add('drag');try{t.setPointerCapture(e.pointerId)}catch(_){}
+    const mv=ev=>{const dx=ev.clientX-x0,dy=ev.clientY-y0;if(Math.hypot(dx,dy)>10)moved=true;t._dx=dx;t._dy=dy;t.style.transform=`translate(${dx}px,${dy}px) scale(1.15)`};
+    const up=ev=>{t.removeEventListener('pointermove',mv);t.removeEventListener('pointerup',up);t.removeEventListener('pointercancel',up);t.classList.remove('drag');
+      const m=L.getBoundingClientRect(),hit=ev.type==='pointerup'&&(!moved||(ev.clientX>m.left-30&&ev.clientX<m.right+30&&ev.clientY>m.top-30&&ev.clientY<m.bottom+30));
+      if(!hit){backTile(t);return}st.removeEventListener('pointerdown',down);res(t)};
+    t.addEventListener('pointermove',mv);t.addEventListener('pointerup',up);t.addEventListener('pointercancel',up)};
+  st.addEventListener('pointerdown',down)})}
+function flyInto(t,L){const a=t.getBoundingClientRect(),m=L.getBoundingClientRect();
+  const x=m.left+m.width/2-(a.left+a.width/2-(t._dx||0)),y=m.top+m.height*.64-(a.top+a.height/2-(t._dy||0));
+  t.classList.add('fly');t.style.transform=`translate(${x}px,${y}px) scale(.15)`}
+async function gameFeed(my,targets,label){const head=$('.lessonhead .lumi');head&&head.classList.add('hidden');
+  try{for(const id of targets){const opts=shuffle([id,...distractors(id,2)]);const txt=wantText(id);
+    stage().innerHTML=`<div class="feedlumi">${lumiHTML()}</div><div class="grid g3 feed">${opts.map(o=>`<button class="tile" data-id="${o}">${pic(o)}</button>`).join('')}</div><button class="again">🔊</button>`;
+    const L=stage().querySelector('.lumi');bubble(txt);await sayE(my,txt);
+    let first=true;
+    for(;;){const b=await dragTo(L);guard(my);
+      if(b.classList.contains('again')){await sayE(my,txt);continue}
+      if(b.dataset.id===id){flyInto(b,L);await sleep(420);guard(my);L.classList.add('eat');sfx.pop();tone(300,.1,'square',.06,.15);tone(260,.1,'square',.06,.35);
+        if(first)addStars(1);await sayE(my,W[id].t==='jedzenie'?'Yummy! Thank you!':'Thank you!');L.classList.remove('eat');await praise(my,first);break}
+      first=false;oops();backTile(b);L.classList.remove('nope');void L.offsetWidth;L.classList.add('nope');await sayE(my,'No, no! '+txt)}
+    label&&grade(id,first?'good':'bad');step()}}
+  finally{head&&head.classList.remove('hidden')}}
+
+/* Мини-диалоги: Lumi спрашивает, ребёнок отвечает фразой. Засчитывается любая попытка, ключевое слово = +2 */
+const art=w=>/^[aeiou]/i.test(w)?'an':'a';
+function plural(w){if(['strawberry','candy'].includes(w))return w.slice(0,-1)+'ies';if(w==='tomato')return 'tomatoes';
+  return ['apple','banana','pear','carrot','egg','cookie'].includes(w)?w+'s':w}
+function fillTalk(d){const f=s=>s.replace(/\{kid\}/g,S.kid||'');return {...d,q:f(d.q),a:f(d.a),r:f(d.r)}}
+function talkSet(){const k=known().filter(id=>S.words[id].seen),dyn=[];
+  const one=ts=>shuffle(k.filter(id=>ts.includes(W[id].t)))[0];
+  let x=one(['jedzenie']);if(x){const p=plural(W[x].en);dyn.push({e:pic(x),q:'What do you like?',a:`I like ${p}.`,pl:'Co lubisz?',k:['like',W[x].en,p],r:`Mmm, ${p}! Me too!`})}
+  x=one(['zwierzęta','dom','pojazdy']);if(x){const w=W[x].en;dyn.push({e:pic(x),q:'What is it?',a:`It's ${art(w)} ${w}.`,pl:'Co to jest?',k:[w],r:`Yes! ${cap(art(w))} ${w}!`})}
+  x=one(['kolory']);if(x){const w=W[x].en;dyn.push({e:pic(x),q:'What color is it?',a:`It's ${w}.`,pl:'Jaki to kolor?',k:[w],r:`Yes! ${cap(w)}!`})}
+  x=one(['liczby']);if(x){const w=W[x].en;dyn.push({e:pic(x),q:'What number is it?',a:`It's ${w}.`,pl:'Jaka to liczba?',k:[w,NUM[w]],r:`Yes! ${cap(w)}!`})}
+  const st=shuffle(TALKS.filter(d=>!d.kid||S.kid));
+  if(!S.talkSeen)return [TALKS[0],S.kid?TALKS[1]:TALKS[2]].map(fillTalk);
+  return [st[0],dyn.length?rnd(dyn):st[1]].map(fillTalk)}
+async function gameTalk(my,items){
+  for(const d of items){
+    stage().innerHTML=`<div class="big pop">${d.e}</div><div class="q">${d.q}</div><div class="hint">${d.pl}</div><div class="ans hidden">💬 ${d.a}</div>
+    <div class="row"><button class="again">🔊</button><button class="mic">🎤</button></div><button class="next hidden">Dalej ➜</button>`;
+    bubble(d.q);await sayE(my,d.q);await sleep(250);guard(my);
+    await sayP(my,'Odpowiedz! Powiedz tak:');stage().querySelector('.ans').classList.remove('hidden');bubble(d.a);await sayE(my,d.a);
+    const r=await speakTurn(my,{en:d.a,ok:alts=>hasKey(alts,d.k)});
+    if(r!=='none'){bubble(d.r);jump();await sayE(my,d.r)}
+    step()}
+  S.talkSeen=true;save()}
 
 async function gameYesNo(my,targets,label){let firstRound=true;
   for(const id of targets){const truth=Math.random()<.5;const shown=truth?id:(distractors(id,1)[0]||id);const isTrue=shown===id;
@@ -513,7 +781,7 @@ async function gameYesNo(my,targets,label){let firstRound=true;
     for(;;){const b=await tapOne('.yes,.nob,.again');guard(my);
       if(b.classList.contains('again')){await sayE(my,W[shown].en);continue}
       if((b.dataset.a==='1')===isTrue){if(first)addStars(1);await praise(my,first);if(!isTrue){await say('To jest','pl');guard(my);await sayE(my,W[id].en)}break}
-      first=false;sfx.oops();b.classList.add('no');await sayP(my,isTrue?'Ojej! To jest właśnie…':'Nie, to jest…');await sayE(my,W[id].en);break}
+      first=false;oops();b.classList.add('no');await sayP(my,isTrue?'Ojej! To jest właśnie…':'Nie, to jest…');await sayE(my,W[id].en);break}
     label&&grade(id,first?'good':'bad');step()}}
 
 async function gameSay(my,targets,label){for(const id of targets){const w=W[id];
@@ -535,36 +803,44 @@ async function gameMemory(my,ids){const cards=shuffle([...ids,...ids]);let open=
 
 let stepsDone=0,stepsTotal=1;function step(){stepsDone++;setProgress(stepsDone/stepsTotal)}
 
+let startStars=0;
 async function startSession(){stopAll();const my=RUN;
   if(!enV)pickVoices();
-  const t=today();
+  const t=today();startStars=S.stars;combo=0;
   const fresh=ORDER.filter(id=>!S.words[id]||!S.words[id].seen).slice(0,S.perDay);
   let due=known().filter(id=>S.words[id].seen&&S.words[id].due&&S.words[id].due<=t).sort((a,b)=>S.words[a].due.localeCompare(S.words[b].due)).slice(0,8);
   if(!fresh.length&&due.length<4)due=due.concat(shuffle(known().filter(id=>!due.includes(id))).slice(0,6-due.length));
   const blocks=[];
-  if(fresh.length){blocks.push({k:'intro',ids:fresh});blocks.push({k:rnd(['pick','balloons']),ids:shuffle(fresh)})}
-  if(due.length){const types=shuffle(['pick','balloons','yesno','say']);
-    if(due.length>4){blocks.push({k:types[0],ids:due.slice(0,4),label:1});blocks.push({k:types[1],ids:due.slice(4),label:1})}
-    else blocks.push({k:types[0],ids:due,label:1})}
+  // «покормить» можно не всеми словами (не «дай мне бабушку»), остальные слова уходят в «найди картинку»
+  const add=(k,ids,label)=>{if(k!=='feed'){blocks.push({k,ids,label});return}
+    const f=ids.filter(feedable),o=ids.filter(x=>!feedable(x));if(f.length)blocks.push({k,ids:f,label});if(o.length)blocks.push({k:'pick',ids:o,label})};
+  if(fresh.length){blocks.push({k:'intro',ids:fresh});add(rnd(['pick','balloons','feed']),shuffle(fresh))}
+  if(due.length){const types=shuffle(['pick','balloons','yesno','say','feed']);
+    if(due.length>4){add(types[0],due.slice(0,4),1);add(types[1],due.slice(4),1)}
+    else add(types[0],due,1)}
   else if(fresh.length)blocks.push({k:'say',ids:shuffle(fresh)});
+  blocks.push({k:'talk',ids:talkSet()});
   const memIds=shuffle([...fresh,...due]).slice(0,3);if(memIds.length===3&&Math.random()<.7)blocks.push({k:'memory',ids:memIds});
   stepsDone=0;stepsTotal=blocks.reduce((s,b)=>s+(b.k==='memory'?1:b.ids.length),0)||1;
   stageScreen();
-  const NAMES={pick:'Teraz zgadujemy! Pokaż, co mówię.',balloons:'Teraz balony! Przebij ten, który powiem.',yesno:'Teraz gra: dobrze czy źle?',say:'Teraz ty mówisz! Jak to jest po angielsku?',memory:'Na koniec: znajdź pary!'};
+  const NAMES={pick:'Teraz zgadujemy! Pokaż, co mówię.',balloons:'Teraz balony! Przebij ten, który powiem.',yesno:'Teraz gra: dobrze czy źle?',say:'Teraz ty mówisz! Jak to jest po angielsku?',memory:'Na koniec: znajdź pary!',
+    feed:'Jestem głodny! Daj mi to, o co poproszę. Przeciągnij palcem do mojej buzi!',talk:S.talkSeen?'Porozmawiajmy!':'Teraz porozmawiamy! Ja pytam, a ty odpowiadasz.'};
   try{
-    if(!S.sessions)await sayP(my,`Cześć! Jestem ${S.name}. Będziemy razem uczyć się angielskiego!`);
+    if(!S.sessions)await sayP(my,`Cześć${kidC()}! Jestem ${S.name}. Będziemy razem uczyć się angielskiego!`);
     else if(due.length&&fresh.length)await sayP(my,'Hej! Dziś nowe słówka i stare przyjaciółki!');
     else await sayP(my,rnd(['Hej! Zaczynamy!','Super, że jesteś! Gramy!']));
     let firstIntro=!S.introSeen;
     for(const b of blocks){
       if(b.k==='intro'){for(const id of b.ids){await intro(my,id,firstIntro);firstIntro=false;S.introSeen=true;wstate(id).box=Math.max(1,wstate(id).box);wstate(id).due=addDays(t,1);save();step()}continue}
-      stage().innerHTML=`<div class="big pop">${{pick:'🔍',balloons:'🎈',yesno:'👍',say:'🎤',memory:'🃏'}[b.k]}</div>`;
+      stage().innerHTML=`<div class="big pop">${{pick:'🔍',balloons:'🎈',yesno:'👍',say:'🎤',memory:'🃏',feed:'🍽️',talk:'💬'}[b.k]}</div>`;
       await sayP(my,NAMES[b.k]);await sleep(300);guard(my);
       if(b.k==='pick')await gamePick(my,b.ids,b.label);
       if(b.k==='balloons')await gameBalloons(my,b.ids,b.label);
       if(b.k==='yesno')await gameYesNo(my,b.ids,b.label);
       if(b.k==='say')await gameSay(my,b.ids,b.label);
       if(b.k==='memory')await gameMemory(my,b.ids);
+      if(b.k==='feed')await gameFeed(my,b.ids,b.label);
+      if(b.k==='talk')await gameTalk(my,b.ids);
     }
     await finish(my,fresh);
   }catch(e){if(e!==STOP)console.error(e)}}
@@ -576,12 +852,17 @@ async function finish(my,fresh){const t=today();
   await sayP(my,'Brawo! Mam dla ciebie prezent. Otwórz!');
   await tapOne('#gift');guard(my);
   const missing=STICKERS.map((s,i)=>i).filter(i=>!S.stickers[i]);const i=missing.length?rnd(missing):Math.random()*STICKERS.length|0;
-  S.stickers[i]=(S.stickers[i]||0)+1;addStars(3);save();sfx.tada();confetti(70);
-  stage().innerHTML=`<div class="reveal">${STICKERS[i][0]}</div><div class="word">${STICKERS[i][1]}</div><button class="next" id="home">🏠 Gotowe</button>`;
+  S.stickers[i]=(S.stickers[i]||0)+1;addStars(3);
+  S.log=S.log.concat({d:t,stars:S.stars-startStars,fresh}).slice(-90);save();sfx.tada();confetti(70);
+  stage().innerHTML=`<div class="reveal">${STICKERS[i][0]}</div><div class="word">${STICKERS[i][1]}</div><button class="next" id="go">Dalej ➜</button>`;
   await sayP(my,'Nowa naklejka!');await sayE(my,STICKERS[i][1]);
   if(fresh.length){await say('Dziś poznałaś:','pl');guard(my);for(const id of fresh){await sayE(my,W[id].en)}}
-  await sayP(my,`${S.name} jest zmęczony i idzie spać. Do jutra!`);
-  await tapOne('#home');home()}
+  await tapOne('#go');guard(my);
+  await travel(my,fresh);
+  if(certDue()){S.certDay=t;save();await sleep(800);guard(my);await diploma(my);return}
+  app.insertAdjacentHTML('beforeend','<button class="next mapbtn" id="home">🏠 Gotowe</button>');
+  await sayP(my,`${S.name} jest zmęczony i idzie spać. Do jutra${kidC()}!`);
+  await click($('#home'));guard(my);home()}
 
 /* ============ ЭКРАН ДЛЯ РОДИТЕЛЕЙ (по-русски) ============ */
 function parent(){stopAll();const ks=known().filter(id=>S.words[id].seen);
@@ -596,7 +877,17 @@ function parent(){stopAll();const ks=known().filter(id=>S.words[id].seen);
    <div style="color:var(--muted);margin-top:6px">Плюс повторение старых слов. Урок занимает примерно 5–8 минут.</div></div>
    <h2>Ещё один урок сегодня</h2><div class="box"><button id="extra">${S.extra?'✓ Разрешено':'Разрешить'}</button>
    <div style="color:var(--muted);margin-top:6px">Обычно 1 урок в день: так интерес держится дольше, чем если играть часами.</div></div>
+   <h2>Неделя</h2><div class="box">${(w=>`За 7 дней: уроков <b>${w.n}</b>, новых слов <b>${w.words.length}</b>, звёзд <b>${w.stars}</b>
+     ${w.words.length?`<div style="margin-top:4px">${w.words.map(id=>W[id].en).join(', ')}</div>`:''}`)(weekData())}<br>
+     <button id="dip">🏅 Показать диплом</button><button id="share">📤 Отправить отчёт</button>
+     <div style="color:var(--muted);margin-top:6px">Диплом сам появляется у ребёнка раз в неделю после урока (на польском, с картинками выученных слов).</div></div>
+   <h2>Имя ребёнка</h2><div class="box"><input id="kid" value="${S.kid}" maxlength="14" placeholder="например, Zosia">
+     <div style="color:var(--muted);margin-top:6px">Lumi хвалит по имени: «Brawo, Zosia!»</div></div>
    <h2>Имя персонажа</h2><div class="box"><input id="nm" value="${S.name.replace(/"/g,'')}" maxlength="14"></div>
+   <h2>Звук</h2><div class="box"><button id="mus">${S.music?'🎵 Фоновая музыка: вкл':'🔇 Фоновая музыка: выкл'}</button>
+     <div style="color:var(--muted);margin-top:6px">Кнопка 🔊 сверху меняет громкость (3 уровня). Если всё равно тихо — громкость медиа кнопками телефона.</div></div>
+   <h2>Знакомство</h2><div class="box"><button id="reob">Пройти знакомство заново</button>
+     <div style="color:var(--muted);margin-top:6px">Ребёнок снова скажет имя и выберет цвет и имя персонажа. Прогресс сохранится.</div></div>
    <h2>Проверка</h2><div class="box"><button id="tv">🔊 Голос</button><button id="tm">🎤 Микрофон</button><div style="color:var(--muted);margin-top:6px;font-size:14px">${voiceInfo}</div></div>
    <h2>Слова (${ks.length})</h2><div class="box"><table>${ks.sort((a,b)=>S.words[b].box-S.words[a].box).map(id=>`<tr><td>${pic(id)}</td><td><b>${W[id].en}</b></td><td>${W[id].pl}</td><td class="dots">${'●'.repeat(S.words[id].box)}${'○'.repeat(5-S.words[id].box)}</td></tr>`).join('')||'<tr><td>Пока пусто</td></tr>'}</table>
    <div style="color:var(--muted);margin-top:6px;font-size:14px">●●●●○ и больше = слово выучено. Ошибка в игре возвращает слово на ●.</div></div>
@@ -605,14 +896,21 @@ function parent(){stopAll();const ks=known().filter(id=>S.words[id].seen);
   $('#back').onclick=home;
   app.querySelectorAll('.pd').forEach(b=>b.onclick=()=>{S.perDay=+b.dataset.n;save();parent()});
   $('#extra').onclick=()=>{S.extra=true;save();parent()};
-  $('#nm').onchange=e=>{S.name=e.target.value.trim()||'Lumi';save()};
+  $('#nm').onchange=e=>{S.name=cleanName(e.target.value)||'Lumi';save()};
+  $('#kid').onchange=e=>{S.kid=cap(cleanName(e.target.value));save()};
+  $('#mus').onclick=()=>{S.music=!S.music;save();S.music?startMusic():stopMusic();parent()};
+  $('#dip').onclick=()=>{stopAll();diploma(RUN)};
+  $('#share').onclick=async()=>{const w=weekData();
+    const txt=`🏅 ${S.kid||'Наша ученица'} за неделю в Lumi Słówka: уроков — ${w.n}, новых слов — ${w.words.length}${w.words.length?' ('+w.words.map(id=>W[id].en).join(', ')+')':''}, звёзд — ${w.stars}.`;
+    try{if(navigator.share)await navigator.share({text:txt});else{await navigator.clipboard.writeText(txt);toast('Отчёт скопирован')}}catch(e){}};
+  $('#reob').onclick=onboard;
   $('#tv').onclick=async()=>{pickVoices();await say('Cześć!','pl');await say('Hello! I am '+S.name,'en')};
   $('#tm').onclick=async e=>{e.target.textContent='🎤 Говорите по-английски…';const r=await listen();e.target.textContent='🎤 Микрофон';
     toast(r.ok?'Услышал: '+r.alts.slice(0,3).join(' / '):'Ошибка: '+r.reason,5000)};
-  $('#reset').onclick=()=>{if(confirm('Точно стереть весь прогресс, звёзды и наклейки?')&&confirm('Совсем точно? Отменить нельзя.')){localStorage.removeItem(KEY);S={...DEF,words:{},stickers:{},hats:[]};home()}};
+  $('#reset').onclick=()=>{if(confirm('Точно стереть весь прогресс, звёзды и наклейки?')&&confirm('Совсем точно? Отменить нельзя.')){localStorage.removeItem(KEY);S={...DEF,words:{},stickers:{},hats:[],isl:{},log:[],trip:0};onboard()}};
 }
 
-home();
+S.onboarded?home():onboard();
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
