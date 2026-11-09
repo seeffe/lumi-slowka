@@ -24,8 +24,10 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .pill{background:var(--card);border-radius:999px;padding:6px 10px;white-space:nowrap;flex-shrink:0;font-size:20px;font-weight:800;display:flex;align-items:center;gap:4px}
 .spacer{flex:1}
 .iconbtn{flex-shrink:0;width:48px;height:48px;border-radius:50%;background:var(--card);font-size:24px;display:grid;place-items:center}
-.gear{opacity:.35;font-size:20px;width:40px;height:40px}
-.gear.holding{opacity:1;box-shadow:0 0 0 4px var(--accent)}
+/* touch-action:none — иначе Chrome на телефоне считает дрожание пальца прокруткой и отменяет удержание */
+.gear{opacity:.35;font-size:20px;width:40px;height:40px;touch-action:none;-webkit-touch-callout:none}
+.gear.holding{opacity:1;animation:gearhold 2s linear forwards}
+@keyframes gearhold{from{box-shadow:0 0 0 0 var(--accent)}to{box-shadow:0 0 0 12px var(--accent);transform:rotate(180deg)}}
 
 /* Lumi */
 .lumiwrap{position:relative;display:flex;justify-content:center;align-items:flex-end}
@@ -531,9 +533,11 @@ function home(){stopAll();const can=canPlay();
   if(can)$('#play').onclick=startSession;
   $('#map').onclick=mapScreen;$('#alb').onclick=album;$('#war').onclick=wardrobe;
   // вход для родителей: удерживать шестерёнку 2 секунды
-  const g=$('#gear');let ht;const st=e=>{e.preventDefault();g.classList.add('holding');ht=setTimeout(()=>{g.classList.remove('holding');parent()},2000)};
+  // палец «захватывается» кнопкой: если он чуть съедет с шестерёнки, удержание не сбросится
+  const g=$('#gear');let ht;const st=e=>{e.preventDefault();try{g.setPointerCapture(e.pointerId)}catch(_){};clearTimeout(ht);
+    g.classList.add('holding');ht=setTimeout(()=>{g.classList.remove('holding');parent()},2000)};
   const en=()=>{clearTimeout(ht);g.classList.remove('holding')};
-  g.addEventListener('pointerdown',st);['pointerup','pointerleave','pointercancel'].forEach(x=>g.addEventListener(x,en));
+  g.addEventListener('pointerdown',st);['pointerup','pointercancel'].forEach(x=>g.addEventListener(x,en));
   g.addEventListener('contextmenu',e=>e.preventDefault());
 }
 
