@@ -374,11 +374,13 @@ const TALKS=[
 {e:'☀️',q:'Good morning!',a:'Good morning!',pl:'Dzień dobry!',k:['good','morning'],r:'What a nice day!'}];
 const FEEDABLE=['jedzenie','dom','ubrania','pojazdy','zwierzęta','kolory','liczby'];
 const VOLS=[.3,.65,1],VOLICON=['🔈','🔉','🔊'];
+// длина урока (выбирается у родителей): игр с новыми словами, старых слов на повторение, доп. слов «для практики», диалогов, шанс игры «пары»
+const LEN={short:{games:1,due:8,extra:0,talks:2,mem:.7},mid:{games:2,due:12,extra:6,talks:3,mem:1},long:{games:3,due:16,extra:10,talks:4,mem:1}};
 
 /* ============ СОХРАНЕНИЕ ============ */
 const KEY='lumi_slowka_v1';
 const DEF={name:'Lumi',perDay:5,stars:0,streak:0,lastDay:null,extra:false,sessions:0,words:{},stickers:{},hats:[],hat:null,introSeen:false,
-  kid:'',color:0,onboarded:false,trip:null,isl:{},log:[],certDay:null,vol:2,music:true,talkSeen:false};
+  len:'mid',kid:'',color:0,onboarded:false,trip:null,isl:{},log:[],certDay:null,vol:2,music:true,talkSeen:false};
 let S; try{S=Object.assign({},DEF,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){S={...DEF}}
 S.isl={...S.isl};S.log=[...S.log];if(S.trip==null)S.trip=S.sessions||0;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
@@ -753,15 +755,16 @@ const art=w=>/^[aeiou]/i.test(w)?'an':'a';
 function plural(w){if(['strawberry','candy'].includes(w))return w.slice(0,-1)+'ies';if(w==='tomato')return 'tomatoes';
   return ['apple','banana','pear','carrot','egg','cookie'].includes(w)?w+'s':w}
 function fillTalk(d){const f=s=>s.replace(/\{kid\}/g,S.kid||'');return {...d,q:f(d.q),a:f(d.a),r:f(d.r)}}
-function talkSet(){const k=known().filter(id=>S.words[id].seen),dyn=[];
+function talkSet(n=2){const k=known().filter(id=>S.words[id].seen),dyn=[];
   const one=ts=>shuffle(k.filter(id=>ts.includes(W[id].t)))[0];
   let x=one(['jedzenie']);if(x){const p=plural(W[x].en);dyn.push({e:pic(x),q:'What do you like?',a:`I like ${p}.`,pl:'Co lubisz?',k:['like',W[x].en,p],r:`Mmm, ${p}! Me too!`})}
   x=one(['zwierzęta','dom','pojazdy']);if(x){const w=W[x].en;dyn.push({e:pic(x),q:'What is it?',a:`It's ${art(w)} ${w}.`,pl:'Co to jest?',k:[w],r:`Yes! ${cap(art(w))} ${w}!`})}
   x=one(['kolory']);if(x){const w=W[x].en;dyn.push({e:pic(x),q:'What color is it?',a:`It's ${w}.`,pl:'Jaki to kolor?',k:[w],r:`Yes! ${cap(w)}!`})}
   x=one(['liczby']);if(x){const w=W[x].en;dyn.push({e:pic(x),q:'What number is it?',a:`It's ${w}.`,pl:'Jaka to liczba?',k:[w,NUM[w]],r:`Yes! ${cap(w)}!`})}
   const st=shuffle(TALKS.filter(d=>!d.kid||S.kid));
-  if(!S.talkSeen)return [TALKS[0],S.kid?TALKS[1]:TALKS[2]].map(fillTalk);
-  return [st[0],dyn.length?rnd(dyn):st[1]].map(fillTalk)}
+  let out=[st[0],...shuffle(dyn),...st.slice(1)];
+  if(!S.talkSeen){const first=[TALKS[0],S.kid?TALKS[1]:TALKS[2]];out=[...first,...out.filter(d=>!first.includes(d))]}
+  return out.slice(0,n).map(fillTalk)}
 async function gameTalk(my,items){
   for(const d of items){
     stage().innerHTML=`<div class="big pop">${d.e}</div><div class="q">${d.q}</div><div class="hint">${d.pl}</div><div class="ans hidden">💬 ${d.a}</div>
@@ -810,19 +813,22 @@ async function startSession(){stopAll();const my=RUN;
   if(!enV)pickVoices();
   const t=today();startStars=S.stars;combo=0;
   const fresh=ORDER.filter(id=>!S.words[id]||!S.words[id].seen).slice(0,S.perDay);
-  let due=known().filter(id=>S.words[id].seen&&S.words[id].due&&S.words[id].due<=t).sort((a,b)=>S.words[a].due.localeCompare(S.words[b].due)).slice(0,8);
+  const L=LEN[S.len]||LEN.mid;
+  let due=known().filter(id=>S.words[id].seen&&S.words[id].due&&S.words[id].due<=t).sort((a,b)=>S.words[a].due.localeCompare(S.words[b].due)).slice(0,L.due);
   if(!fresh.length&&due.length<4)due=due.concat(shuffle(known().filter(id=>!due.includes(id))).slice(0,6-due.length));
+  // если старых слов «по графику» мало — доигрываем знакомыми словами без оценки (коробки не меняются)
+  const practice=shuffle(known().filter(id=>S.words[id].seen&&!due.includes(id)&&!fresh.includes(id))).slice(0,Math.min(L.extra,Math.max(0,L.due-due.length)));
   const blocks=[];
   // «покормить» можно не всеми словами (не «дай мне бабушку»), остальные слова уходят в «найди картинку»
   const add=(k,ids,label)=>{if(k!=='feed'){blocks.push({k,ids,label});return}
     const f=ids.filter(feedable),o=ids.filter(x=>!feedable(x));if(f.length)blocks.push({k,ids:f,label});if(o.length)blocks.push({k:'pick',ids:o,label})};
-  if(fresh.length){blocks.push({k:'intro',ids:fresh});add(rnd(['pick','balloons','feed']),shuffle(fresh))}
-  if(due.length){const types=shuffle(['pick','balloons','yesno','say','feed']);
-    if(due.length>4){add(types[0],due.slice(0,4),1);add(types[1],due.slice(4),1)}
-    else add(types[0],due,1)}
-  else if(fresh.length)blocks.push({k:'say',ids:shuffle(fresh)});
-  blocks.push({k:'talk',ids:talkSet()});
-  const memIds=shuffle([...fresh,...due]).slice(0,3);if(memIds.length===3&&Math.random()<.7)blocks.push({k:'memory',ids:memIds});
+  if(fresh.length){blocks.push({k:'intro',ids:fresh});shuffle(['pick','balloons','feed','yesno']).slice(0,L.games).forEach(k=>add(k,shuffle(fresh)))}
+  const types=shuffle(['pick','balloons','yesno','say','feed']);let ti=0;
+  for(let i=0;i<due.length;i+=4)add(types[ti++%types.length],due.slice(i,i+4),1);
+  for(let i=0;i<practice.length;i+=4)add(types[ti++%types.length],practice.slice(i,i+4));
+  if(!due.length&&!practice.length&&fresh.length)blocks.push({k:'say',ids:shuffle(fresh)});
+  blocks.push({k:'talk',ids:talkSet(L.talks)});
+  const memIds=shuffle([...fresh,...due,...practice]).slice(0,3);if(memIds.length===3&&Math.random()<L.mem)blocks.push({k:'memory',ids:memIds});
   stepsDone=0;stepsTotal=blocks.reduce((s,b)=>s+(b.k==='memory'?1:b.ids.length),0)||1;
   stageScreen();
   const NAMES={pick:'Teraz zgadujemy! Pokaż, co mówię.',balloons:'Teraz balony! Przebij ten, który powiem.',yesno:'Teraz gra: dobrze czy źle?',say:'Teraz ty mówisz! Jak to jest po angielsku?',memory:'Na koniec: znajdź pary!',
@@ -876,7 +882,9 @@ function parent(){stopAll();const ks=known().filter(id=>S.words[id].seen);
    <div class="box">Занятий: <b>${S.sessions}</b> · Дней подряд: <b>${S.streak}</b> · Звёзд: <b>${S.stars}</b> · Наклеек: <b>${Object.keys(S.stickers).length}/${STICKERS.length}</b><br>
    Последнее занятие: <b>${S.lastDay||'ещё не было'}</b></div>
    <h2>Новых слов в день</h2><div class="box">${[3,5,7].map(n=>`<button class="pd ${S.perDay===n?'sel':''}" data-n="${n}">${n}</button>`).join('')}
-   <div style="color:var(--muted);margin-top:6px">Плюс повторение старых слов. Урок занимает примерно 5–8 минут.</div></div>
+   <div style="color:var(--muted);margin-top:6px">Плюс повторение старых слов.</div></div>
+   <h2>Длина урока</h2><div class="box">${[['short','Короткий'],['mid','Обычный'],['long','Длинный']].map(([k,n])=>`<button class="ln ${S.len===k?'sel':''}" data-k="${k}">${n}</button>`).join('')}
+   <div style="color:var(--muted);margin-top:6px">Короткий ≈ 5 минут, обычный ≈ 10, длинный ≈ 15. Длиннее = больше игр, повторения и диалогов (новых слов столько же).</div></div>
    <h2>Ещё один урок сегодня</h2><div class="box"><button id="extra">${S.extra?'✓ Разрешено':'Разрешить'}</button>
    <div style="color:var(--muted);margin-top:6px">Обычно 1 урок в день: так интерес держится дольше, чем если играть часами.</div></div>
    <h2>Неделя</h2><div class="box">${(w=>`За 7 дней: уроков <b>${w.n}</b>, новых слов <b>${w.words.length}</b>, звёзд <b>${w.stars}</b>
@@ -897,6 +905,7 @@ function parent(){stopAll();const ks=known().filter(id=>S.words[id].seen);
   </div>`;
   $('#back').onclick=home;
   app.querySelectorAll('.pd').forEach(b=>b.onclick=()=>{S.perDay=+b.dataset.n;save();parent()});
+  app.querySelectorAll('.ln').forEach(b=>b.onclick=()=>{S.len=b.dataset.k;save();parent()});
   $('#extra').onclick=()=>{S.extra=true;save();parent()};
   $('#nm').onchange=e=>{S.name=cleanName(e.target.value)||'Lumi';save()};
   $('#kid').onchange=e=>{S.kid=cap(cleanName(e.target.value));save()};
